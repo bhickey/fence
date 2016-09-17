@@ -1,0 +1,10 @@
+[package]
+name = "fence"
+version = "0.0.1"
+authors = ["Brendan Hickey <brendan@bhickey.net>"]
+license = "MIT/Apache-2.0"
+description = """
+A rate limiter for threaded programs.
+"""
+
+[dependencies]
