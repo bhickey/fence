@@ -1,12 +1,16 @@
 use std::{thread, time};
+use std::marker::{Send, Sync};
 
 pub struct Fence {
   duration: time::Duration,
   block_until: time::Instant,
 }
 
+unsafe impl Send for Fence {}
+unsafe impl Sync for Fence {}
+
 /// Fence provides a timed rate limiter. It's useful for imposing a framerate
-/// cap on a UI thread.
+/// cap on a UI thread, or enforcing periodicity on a polling thread.
 /// 
 /// In a typical usage, place a fence at the end of a loop to control the
 /// invocation rate.
@@ -37,6 +41,15 @@ impl Fence {
           thread::sleep(self.block_until.duration_since(now))
         }
         self.block_until = time::Instant::now() + self.duration;
+    }
+
+    pub fn allow(&mut self) -> bool {
+        let now = time::Instant::now();
+        if now < self.block_until {
+            return false;
+        }
+        self.block_until = now + self.duration;
+        true
     }
 }
 
